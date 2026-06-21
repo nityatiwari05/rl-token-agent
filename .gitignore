@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.pyre/
+.mypy_cache/
+
+# Virtual environments
+venv/
+.env/
+.env.*
+.venv/
+
+# Package / dependency caches
+pip-wheel-metadata/
+python-wheel-metadata/
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs and local runtime
+logs/
+*.log
+*.sqlite3
+
+# Model and data caches
+*.ckpt
+*.pt
+*.pth
+*.npz
+
+# Temporary files
+*.tmp
+*.temp
+*~
