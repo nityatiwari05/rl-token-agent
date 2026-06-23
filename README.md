@@ -1,6 +1,6 @@
 # RL Token Agent: Learning When to Retrieve, When to Pay, and When to Stop
 
-> A reinforcement learning policy that controls an LLM pipeline's compute spend — deciding what to retrieve, which model tier to call, and when to stop — to maximize accuracy per token, not just accuracy.
+> A reinforcement learning policy that controls an LLM pipeline's compute spend, deciding what to retrieve, which model tier to call, and when to stop, to maximize accuracy per token, not just accuracy.
 
 ---
 
@@ -38,7 +38,7 @@ This preserves a genuine cost/quality tradeoff (more samples and more context co
 
 ## 3. Environment design
 
-I treated the whole problem as a **finite-horizon POMDP** where the agent controls computation, not content. The agent isn't answering questions directly — it's deciding *how much and what kind* of computation to spend before producing an answer.
+I treated the whole problem as a **finite-horizon POMDP** where the agent controls computation, not content. The agent isn't answering questions directly,it 's deciding *how much and what kind* of computation to spend before producing an answer.
 
 **State** (vectorized, never raw text — raw text as RL state would be both intractable and uninterpretable):
 - Tokens spent so far
