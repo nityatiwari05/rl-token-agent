@@ -12,7 +12,6 @@ That last layer, orchestration, is the one that's actually a decision-making pro
 
 The project translates that single observation into a concrete system: an RL agent that sits *above* an LLM pipeline and decides, at each step, whether to retrieve more documents, which model tier to call, whether to refine the query, or whether to stop, trained to maximize **accuracy per token spent**, not accuracy alone.
 
-The bar I set, explicitly, from the start: this had to be a real RL problem with a real environment, real baselines, and a real cost-vs-accuracy result, not "RL picks GPT-4 vs GPT-3.5" or "RL decides retry count," which would be shallow and obvious.
 ---
 
 ## 2. The constraints that shaped every decision
