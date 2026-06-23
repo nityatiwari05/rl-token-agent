@@ -113,7 +113,7 @@ But a number that clean deserved suspicion before celebration. 97–100% accurac
 
 **Why this is a reward-design issue, reasoned through explicitly:** the reward function computed the same value for an explicit `STOP` as for a forced truncation at the horizon — both just used whatever `steps_used` and `tokens_used` were at termination. Since `REFINE_QUERY` cost nothing, there was no incentive to spend a step explicitly stopping when padding with free actions produced an identical reward. The policy wasn't "wrong" — it was correctly exploiting the actual reward function we wrote, which is arguably a more useful failure than a policy that's just bad, because it told us precisely what to fix.
 
-**Fix, asked of the user directly rather than assumed:** both (a) charge a small token cost for `REFINE_QUERY` so it's no longer a true no-op, and (b) add a small explicit bonus for calling `STOP` deliberately versus being truncated.
+**Fix** both (a) charge a small token cost for `REFINE_QUERY` so it's no longer a true no-op, and (b) add a small explicit bonus for calling `STOP` deliberately versus being truncated.
 
 **Iteration 1 of the fix didn't work — and the *way* it didn't work was itself informative.** After charging `REFINE_QUERY`, the policy didn't start calling `STOP`. It just moved the no-op behavior to `RETRIEVE_1` instead, since retrieval was still free. This was an important confirmation: the issue wasn't "REFINE_QUERY is exploitable," it was "any free action is exploitable as padding." Patching one symptom just relocated the exploit, which is the expected outcome when you fix an instance of a problem instead of the general shape of it.
 
