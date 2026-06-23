@@ -20,11 +20,11 @@ The bar I set, explicitly, from the start: this had to be a real RL problem with
 Before any code, I was honest about the real world constraints, because they determined almost every design choice downstream:
 
 - **No paid API access.** Only a local Ollama 3.1:8B model, usable in real training, plus a handful of calls reserved for final validation against a stronger model later.
-- **An 8B local model is a noisy, weak signal source.** Logprobs and self-reported confidence from an 8B model are not reliable enough to use as the state signal for an RL policy — they'd inject noise directly into the thing the policy is supposed to learn from.
+- **An 8B local model is a noisy, weak signal source.** Logprobs and self reported confidence from an 8B model are not reliable enough to use as the state signal for an RL policy, they'd inject noise directly into the thing the policy is supposed to learn from.
 
 Two design decisions fell directly out of these constraints:
 
-**1. Confidence had to be rule-based, not logprob-based.** Instead of trusting the LLM's self-assessment of how confident it is, the environment derives a confidence/agreement signal from *observable* things: retrieval relevance scores and answer agreement across multiple samples. This is arguably more honest anyway — the policy should learn from evidence in the world, not from an 8B model's possibly-miscalibrated sense of its own certainty.
+**1. Confidence had to be rule-based, not logprob-based.** Instead of trusting the LLM's self-assessment of how confident it is, the environment derives a confidence/agreement signal from *observable* things: retrieval relevance scores and answer agreement across multiple samples. This is arguably more honest anyway, the policy should learn from evidence in the world, not from an 8B model's possibly-miscalibrated sense of its own certainty.
 
 **2. "Cheap" vs "expensive" model tiers had to be simulated, not real.** With only one local model available, we couldn't literally call GPT-3.5 vs GPT-4. Instead:
 - **Cheap tier** = 1 sample, small context (top-ranked docs only)
@@ -32,7 +32,7 @@ Two design decisions fell directly out of these constraints:
 
 This preserves a genuine cost/quality tradeoff (more samples and more context cost more tokens and tend to be more accurate) without needing a second real model.
 
-**3. Ground truth had to be programmatically generated, not LLM-graded.** I considered three options for the QA environment: hand-built structured "worlds" with deterministic facts, fully programmatic tasks (lookup/arithmetic), or an existing multi-hop QA dataset like HotpotQA. We went with the **structured, programmatic option** and explicitly ruled out HotpotQA — it would have meant losing control over difficulty and introducing LLM-grading ambiguity into the reward signal, which is exactly the kind of untrustworthy reward that would have made the eventual RL result meaningless. If ground truth isn't computable without an LLM in the loop, you can't trust the reward, and if you can't trust the reward, you can't trust anything the policy learns.
+**3. Ground truth had to be programmatically generated, not LLM-graded.** I considered three options for the QA environment: hand-built structured "worlds" with deterministic facts, fully programmatic tasks (lookup/arithmetic), or an existing multi-hop QA dataset like HotpotQA. We went with the **structured, programmatic option** and explicitly ruled out HotpotQA, it would have meant losing control over difficulty and introducing LLM-grading ambiguity into the reward signal, which is exactly the kind of untrustworthy reward that would have made the eventual RL result meaningless. If ground truth isn't computable without an LLM in the loop, you can't trust the reward, and if you can't trust the reward, you can't trust anything the policy learns.
 
 ---
 
@@ -62,13 +62,13 @@ R = 1[answer == ground_truth] − λ · tokens_used − α · steps_used
 
 with an optional explicit-stop bonus added later (see §5.3) to fix a behavioral bug.
 
-**Episode structure:** a hard horizon (6 steps) and a token budget, both enforced — because without a hard cap, there's no actual decision to make about *when* to stop.
+**Episode structure:** a hard horizon (6 steps) and a token budget, both enforced, because without a hard cap, there's no actual decision to make about *when* to stop.
 
 ---
 
 ## 4. Why retrieval quality was treated as a first-class problem, not a detail
 
-Retrieval determines what the model has to read before it can think, and that fixing retrieval matters more than fixing prompts — is directly encoded into the synthetic world generator and the mock LLM provider. The mock provider's error rate doesn't just depend on whether the *correct* document was retrieved; it also scales **up** with the number of *irrelevant* documents present in the prompt. This was a deliberate modeling choice: it makes the environment actually reward retrieval precision, not just retrieval recall. A policy that retrieves 5 docs (1 relevant + 4 noisy distractors) should — and does — perform worse than one that retrieves 1 highly relevant doc, even though it "saw more information." That asymmetry is the whole thesis of the source material, made measurable.
+Retrieval determines what the model has to read before it can think, and that fixing retrieval matters more than fixing prompts, is directly encoded into the synthetic world generator and the mock LLM provider. The mock provider's error rate doesn't just depend on whether the *correct* document was retrieved; it also scales **up** with the number of *irrelevant* documents present in the prompt. This was a deliberate modeling choice: it makes the environment actually reward retrieval precision, not just retrieval recall. A policy that retrieves 5 docs (1 relevant + 4 noisy distractors) should — and does — perform worse than one that retrieves 1 highly relevant doc, even though it "saw more information." That asymmetry is the whole thesis of the source material, made measurable.
 
 ---
 
